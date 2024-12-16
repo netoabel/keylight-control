@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-const App: React.FC = () => {
+export function App() {
   const [isOn, setIsOn] = useState(false)
   const [brightness, setBrightness] = useState(50)
 
@@ -90,6 +90,4 @@ const App: React.FC = () => {
     </div>
   )
 }
-
-export default App
 
