@@ -48,13 +48,3 @@ npm run electron:build
 ```
 
 This will generate platform-specific installers in the `release` directory.
-
-## Project Structure
-
-├── electron/ # Electron main process files
-├── src/ # React application source
-│ ├── components/ # React components
-│ ├── lib/ # Utility functions
-│ └── App.tsx # Main React component
-├── dist/ # Built React application
-└── electron-dist/ # Built Electron files
