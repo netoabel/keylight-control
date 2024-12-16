@@ -6,7 +6,7 @@ let mainWindow: BrowserWindow | null = null;
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 362,
-    height: 273,
+    height: 268,
     titleBarStyle: "customButtonsOnHover",
     frame: false,
     resizable: false,
