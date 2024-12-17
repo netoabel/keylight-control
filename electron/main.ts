@@ -1,5 +1,8 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
+import { KeyLight } from "elgato-keylight";
+
+const keylight = new KeyLight();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -54,13 +57,16 @@ ipcMain.on("keylight-control", async (_event, args) => {
     switch (args.action) {
       //Call the keylight methods
       case "turnOn":
-        // await setState({ on: 1 });
+        console.log("turnOn");
+        await keylight.setState({ on: 1 });
         break;
       case "turnOff":
-        // await setState({ on: 0 });
+        console.log("turnOff");
+        await keylight.setState({ on: 0 });
         break;
       case "setBrightness":
-        // await setBrightness(args.value);
+        console.log("setBrightness", args.value);
+        await keylight.setBrightness(args.value);
         break;
       default:
         console.error("Unknown action:", args.action);
