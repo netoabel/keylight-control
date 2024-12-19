@@ -1,6 +1,8 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import { KeyLight } from "elgato-keylight";
+import * as camera from "camera-watch";
+import * as worker from "./worker";
 
 const keylight = new KeyLight();
 
@@ -38,7 +40,15 @@ function createWindow(): void {
   });
 }
 
-app.whenReady().then(createWindow);
+app
+  .whenReady()
+  .then(createWindow)
+  .then(() => {
+    camera.watch({
+      onChange: updateKeylightState,
+      onError: (error) => console.error(error),
+    });
+  });
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -55,7 +65,6 @@ app.on("activate", () => {
 ipcMain.on("keylight-control", async (_event, args) => {
   try {
     switch (args.action) {
-      //Call the keylight methods
       case "turnOn":
         console.log("turnOn");
         await keylight.setState({ on: 1 });
@@ -75,3 +84,15 @@ ipcMain.on("keylight-control", async (_event, args) => {
     console.error("Failed to control Keylight:", error);
   }
 });
+
+function updateKeylightState(newState: string): void {
+  worker.run({
+    action: async () => {
+      await keylight.setState({ on: toBinary(newState) });
+    },
+  });
+}
+
+function toBinary(state: string): number {
+  return state === "On" ? 1 : 0;
+}
