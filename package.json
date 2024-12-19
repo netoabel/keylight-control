@@ -1,5 +1,10 @@
 {
   "name": "keylight-control",
+  "author": {
+    "name": "netoabel",
+    "email": "abel.neto@gmail.com",
+    "url": "https://github.com/netoabel"
+  },
   "private": true,
   "version": "0.0.0",
   "type": "commonjs",
@@ -17,7 +22,7 @@
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.1.2",
-    "camera-watch": "^1.0.5",
+    "camera-watch": "^1.0.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "electron-is-dev": "^2.0.0",
