@@ -7,11 +7,12 @@ import * as worker from "./worker";
 const keylight = new KeyLight();
 
 let mainWindow: BrowserWindow | null = null;
+let autoModeEnabled = false;
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 362,
-    height: 268,
+    height: 310,
     titleBarStyle: "customButtonsOnHover",
     frame: false,
     resizable: false,
@@ -77,6 +78,10 @@ ipcMain.on("keylight-control", async (_event, args) => {
         console.log("setBrightness", args.value);
         await keylight.setBrightness(args.value);
         break;
+      case "setAutoMode":
+        console.log("setAutoMode", args.enabled);
+        autoModeEnabled = args.enabled;
+        break;
       default:
         console.error("Unknown action:", args.action);
     }
@@ -86,6 +91,8 @@ ipcMain.on("keylight-control", async (_event, args) => {
 });
 
 function updateKeylightState(newState: string): void {
+  if (!autoModeEnabled) return;
+
   worker.run({
     action: async () => {
       await keylight.setState({ on: toBinary(newState) });

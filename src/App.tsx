@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import "./App.css"
 
@@ -15,11 +16,22 @@ declare global {
 export function App() {
   const [isOn, setIsOn] = useState(false)
   const [brightness, setBrightness] = useState(50)
+  const [autoMode, setAutoMode] = useState(false)
 
   const handleToggle = () => {
     setIsOn(!isOn)
     if (window.electron) {
       window.electron.sendMessage("keylight-control", { action: isOn ? "turnOff" : "turnOn" })
+    }
+  }
+
+  const handleAutoModeToggle = (checked: boolean) => {
+    setAutoMode(checked)
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", { 
+        action: "setAutoMode", 
+        enabled: checked 
+      })
     }
   }
 
@@ -48,6 +60,13 @@ export function App() {
             <CardDescription className="text-gray-400">Manage your keylight settings</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 app-no-drag">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Camera Auto-Mode</span>
+              <Switch
+                checked={autoMode}
+                onCheckedChange={handleAutoModeToggle}
+              />
+            </div>
             <Button
               onClick={handleToggle}
               className="w-full bg-[#E60133] hover:bg-buttonRed/90 text-white"
