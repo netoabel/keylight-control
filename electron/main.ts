@@ -4,7 +4,7 @@ import { KeyLight } from "elgato-keylight";
 import * as camera from "camera-watch";
 import * as worker from "./worker";
 
-const keylight = new KeyLight("localhost", 9123);
+const keylight = new KeyLight();
 
 let mainWindow: BrowserWindow | null = null;
 let autoModeEnabled = false;
