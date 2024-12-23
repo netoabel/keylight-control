@@ -1,10 +1,29 @@
 const http = require("http");
 
+// Initial state
+let keylightState = {
+  numberOfLights: 1,
+  lights: [
+    {
+      on: 1,
+      brightness: 50,
+      temperature: 7000,
+    },
+  ],
+};
+
 const server = http.createServer((req, res) => {
   const { method, url } = req;
 
   console.log(`\n${method} ${url}`);
   console.log("Headers:", req.headers);
+
+  // Handle GET request for current state
+  if (method === "GET" && url === "/elgato/lights") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(keylightState));
+    return;
+  }
 
   let body = "";
   req.on("data", (chunk) => {
@@ -12,33 +31,31 @@ const server = http.createServer((req, res) => {
   });
 
   req.on("end", () => {
-    if (body) {
+    if (method === "PUT" && url === "/elgato/lights" && body) {
       try {
-        const jsonBody = JSON.parse(body);
-        console.log("Body:", JSON.stringify(jsonBody, null, 2));
+        const update = JSON.parse(body);
+        // Update state based on the request
+        if (update.lights) {
+          const light = update.lights[0];
+          if (light.on !== undefined) keylightState.lights[0].on = light.on;
+          if (light.brightness !== undefined) keylightState.lights[0].brightness = light.brightness;
+          if (light.temperature !== undefined)
+            keylightState.lights[0].temperature = light.temperature;
+        }
+        console.log("Updated state:", JSON.stringify(keylightState, null, 2));
       } catch (e) {
-        console.log("Body:", body);
+        console.error("Failed to parse body:", body);
       }
     }
 
-    // Always return 200 OK with empty lights array
+    // Return current state
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        numberOfLights: 1,
-        lights: [
-          {
-            on: 1,
-            brightness: 50,
-            temperature: 7000,
-          },
-        ],
-      })
-    );
+    res.end(JSON.stringify(keylightState));
   });
 });
 
-const PORT = 9123; // Same port used by Elgato Key Light
+const PORT = 9123;
 server.listen(PORT, () => {
   console.log(`Test server running at http://localhost:${PORT}`);
+  console.log("Initial state:", JSON.stringify(keylightState, null, 2));
 });

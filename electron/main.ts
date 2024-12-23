@@ -39,6 +39,8 @@ function createWindow(): void {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  syncKeylightState();
 }
 
 app
@@ -69,14 +71,20 @@ ipcMain.on("keylight-control", async (_event, args) => {
       case "turnOn":
         console.log("turnOn");
         await keylight.setState({ on: 1 });
+        await syncKeylightState();
         break;
       case "turnOff":
         console.log("turnOff");
         await keylight.setState({ on: 0 });
+        await syncKeylightState();
         break;
       case "setBrightness":
         console.log("setBrightness", args.value);
         await keylight.setBrightness(args.value);
+        await syncKeylightState();
+        break;
+      case "getState":
+        await syncKeylightState();
         break;
       case "setAutoMode":
         console.log("setAutoMode", args.enabled);
@@ -90,12 +98,25 @@ ipcMain.on("keylight-control", async (_event, args) => {
   }
 });
 
+async function syncKeylightState() {
+  try {
+    const state = await keylight.getCurrentState();
+    mainWindow?.webContents.send("keylight-state", {
+      on: state.on === 1,
+      brightness: state.brightness,
+    });
+  } catch (error) {
+    console.error("Failed to get Keylight state:", error);
+  }
+}
+
 function updateKeylightState(newState: string): void {
   if (!autoModeEnabled) return;
 
   worker.run({
     action: async () => {
       await keylight.setState({ on: toBinary(newState) });
+      await syncKeylightState();
     },
   });
 }

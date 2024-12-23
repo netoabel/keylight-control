@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
@@ -9,6 +9,7 @@ declare global {
   interface Window {
     electron: {
       sendMessage: (channel: string, args: any) => void
+      onMessage: (channel: string, callback: (args: any) => void) => void
     }
   }
 }
@@ -17,6 +18,19 @@ export function App() {
   const [isOn, setIsOn] = useState(false)
   const [brightness, setBrightness] = useState(50)
   const [autoMode, setAutoMode] = useState(false)
+
+  useEffect(() => {
+    // Request initial state
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", { action: "getState" });
+      
+      // Listen for state updates
+      window.electron.onMessage("keylight-state", (state) => {
+        setIsOn(state.on);
+        setBrightness(state.brightness);
+      });
+    }
+  }, []);
 
   const handleToggle = () => {
     setIsOn(!isOn)
