@@ -12,7 +12,7 @@ A sleek desktop application to control your Elgato Key Light. Features automatic
 
 ## Installation
 
-Download the latest version from the [Releases](https://github.com/netoabel/keylight-control/releases/latest) page.
+Download and install the [latest version](https://github.com/netoabel/keylight-control/releases/latest).
 
 ### Requirements
 
