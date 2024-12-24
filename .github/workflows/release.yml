@@ -18,19 +18,26 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: "npm"
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          npm ci
+          npm run postinstall
 
-      - name: Build and Package
-        run: npm run electron:build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Frontend
+        run: npm run build
+
+      - name: Build Electron
+        run: |
+          npm run electron:build
+          ls -la release/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            release/*.dmg
+          files: release/*.dmg
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
