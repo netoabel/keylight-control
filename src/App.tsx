@@ -58,7 +58,7 @@ export function App() {
   }
 
   const handlePresetBrightness = (preset: "high" | "low") => {
-    const presetValue = preset === "high" ? 100 : 20
+    const presetValue = preset === "high" ? 30 : 10
     setBrightness(presetValue)
     if (window.electron) {
       window.electron.sendMessage("keylight-control", { action: "setBrightness", value: presetValue })
