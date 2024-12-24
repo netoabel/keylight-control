@@ -32,6 +32,8 @@ jobs:
         run: |
           npm run electron:build
           ls -la release/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
