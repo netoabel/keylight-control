@@ -20,6 +20,7 @@ const keylight =
 
 let mainWindow: BrowserWindow | null = null;
 let autoModeEnabled = store.get("autoModeEnabled");
+let isConnected = false;
 
 function createWindow(): void {
   const { x, y } = store.get("windowBounds");
@@ -108,31 +109,46 @@ ipcMain.on("keylight-control", async (_event, args) => {
         await syncKeylightState();
         break;
       case "getState":
+      case "retry":
         await syncKeylightState();
         break;
       case "setAutoMode":
         console.log("setAutoMode", args.enabled);
         autoModeEnabled = args.enabled;
         store.set("autoModeEnabled", args.enabled);
+        await syncKeylightState();
         break;
       default:
         console.error("Unknown action:", args.action);
     }
   } catch (error) {
     console.error("Failed to control Keylight:", error);
+    // Send disconnected state when any operation fails
+    isConnected = false;
+    mainWindow?.webContents.send("keylight-state", {
+      connected: false,
+      error: "Could not connect to keylight",
+    });
   }
 });
 
 async function syncKeylightState() {
   try {
     const state = await keylight.getCurrentState();
+    isConnected = true;
     mainWindow?.webContents.send("keylight-state", {
+      connected: true,
       on: state.on === 1,
       brightness: state.brightness,
       autoMode: autoModeEnabled,
     });
   } catch (error) {
     console.error("Failed to get Keylight state:", error);
+    isConnected = false;
+    mainWindow?.webContents.send("keylight-state", {
+      connected: false,
+      error: "Could not connect to keylight",
+    });
   }
 }
 
@@ -141,8 +157,17 @@ function updateKeylightState(newState: string): void {
 
   worker.run({
     action: async () => {
-      await keylight.setState({ on: toBinary(newState) });
-      await syncKeylightState();
+      try {
+        await keylight.setState({ on: toBinary(newState) });
+        await syncKeylightState();
+      } catch (error) {
+        console.error("Failed to update keylight state:", error);
+        isConnected = false;
+        mainWindow?.webContents.send("keylight-state", {
+          connected: false,
+          error: "Could not connect to keylight",
+        });
+      }
     },
   });
 }

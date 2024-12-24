@@ -18,20 +18,57 @@ export function App() {
   const [isOn, setIsOn] = useState(false)
   const [brightness, setBrightness] = useState(50)
   const [autoMode, setAutoMode] = useState(false)
+  const [connected, setConnected] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (window.electron) {
-      // Listen for state updates
       window.electron.onMessage("keylight-state", (state) => {
-        setIsOn(state.on);
-        setBrightness(state.brightness);
-        setAutoMode(state.autoMode);
-      });
+        if (state.connected) {
+          setConnected(true)
+          setError(null)
+          setIsOn(state.on)
+          setBrightness(state.brightness)
+          setAutoMode(state.autoMode)
+        } else {
+          setConnected(false)
+          setError(state.error)
+        }
+      })
 
-      // Request initial state
-      window.electron.sendMessage("keylight-control", { action: "getState" });
+      window.electron.sendMessage("keylight-control", { action: "getState" })
     }
-  }, []);
+  }, [])
+
+  const handleRetry = () => {
+    window.electron.sendMessage("keylight-control", { action: "retry" })
+  }
+
+  if (!connected) {
+    return (
+      <div className="min-h-screen bg-black flex items-center">
+        <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-black/50 backdrop-blur-sm" />
+        <div className="w-full">
+          <Card className="w-[360px] mx-auto bg-black border-none">
+            <CardHeader className="app-drag cursor-move">
+              <CardTitle className="text-white text-center text-2xl font-normal">
+                Could not connect to keylight
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 app-no-drag flex flex-col items-center">
+              <Button
+                onClick={handleRetry}
+                className="w-32 bg-neutral-800 hover:bg-neutral-700 text-white rounded-full"
+                variant="default"
+              >
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
 
   const handleToggle = () => {
     setIsOn(!isOn)
