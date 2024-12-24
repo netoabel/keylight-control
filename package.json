@@ -6,7 +6,7 @@
     "url": "https://github.com/netoabel"
   },
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
