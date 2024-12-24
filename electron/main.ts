@@ -16,7 +16,7 @@ const store = new Store({
 });
 
 const keylight =
-  process.env.NODE_ENV === "development" ? new KeyLight() : new KeyLight("localhost", 9123);
+  process.env.NODE_ENV === "development" ? new KeyLight("localhost", 9123) : new KeyLight();
 
 let mainWindow: BrowserWindow | null = null;
 let autoModeEnabled = store.get("autoModeEnabled");
@@ -48,7 +48,7 @@ function createWindow(): void {
   if (isDev) {
     mainWindow.loadURL("http://localhost:5173");
   } else {
-    const indexPath = path.join(__dirname, "..", "dist", "index.html");
+    const indexPath = path.join(__dirname, "../dist/index.html");
     mainWindow.loadFile(indexPath);
   }
 
