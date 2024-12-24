@@ -58,8 +58,8 @@ export function App() {
             <CardContent className="space-y-4 app-no-drag flex flex-col items-center">
               <Button
                 onClick={handleRetry}
-                className="w-32 bg-neutral-800 hover:bg-neutral-700 text-white rounded-full"
-                variant="default"
+                variant="outline"
+                className="w-32 bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
               >
                 Try Again
               </Button>
