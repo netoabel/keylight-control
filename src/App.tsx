@@ -20,15 +20,16 @@ export function App() {
   const [autoMode, setAutoMode] = useState(false)
 
   useEffect(() => {
-    // Request initial state
     if (window.electron) {
-      window.electron.sendMessage("keylight-control", { action: "getState" });
-      
       // Listen for state updates
       window.electron.onMessage("keylight-state", (state) => {
         setIsOn(state.on);
         setBrightness(state.brightness);
+        setAutoMode(state.autoMode);
       });
+
+      // Request initial state
+      window.electron.sendMessage("keylight-control", { action: "getState" });
     }
   }, []);
 

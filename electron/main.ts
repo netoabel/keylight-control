@@ -3,11 +3,18 @@ import * as path from "path";
 import { KeyLight } from "elgato-keylight";
 import * as camera from "camera-watch";
 import * as worker from "./worker";
+const Store = require("electron-store");
+
+const store = new Store({
+  defaults: {
+    autoModeEnabled: false,
+  },
+});
 
 const keylight = new KeyLight();
 
 let mainWindow: BrowserWindow | null = null;
-let autoModeEnabled = false;
+let autoModeEnabled = store.get("autoModeEnabled");
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -89,6 +96,7 @@ ipcMain.on("keylight-control", async (_event, args) => {
       case "setAutoMode":
         console.log("setAutoMode", args.enabled);
         autoModeEnabled = args.enabled;
+        store.set("autoModeEnabled", args.enabled);
         break;
       default:
         console.error("Unknown action:", args.action);
@@ -104,6 +112,7 @@ async function syncKeylightState() {
     mainWindow?.webContents.send("keylight-state", {
       on: state.on === 1,
       brightness: state.brightness,
+      autoMode: autoModeEnabled,
     });
   } catch (error) {
     console.error("Failed to get Keylight state:", error);
