@@ -1,50 +1,51 @@
 # Keylight Control
 
-A desktop application built with Electron and React to control Elgato Key Light devices. This app provides an easy-to-use interface for managing your Key Light settings directly from your desktop.
+A sleek desktop application to control your Elgato Key Light. Features automatic camera-based control and a modern user interface.
+
+![App Screenshot](screenshots/app.png)
 
 ## Features
 
-- Toggle Key Light on/off
-- Adjust brightness levels
-- Quick preset controls (High/Low brightness)
-- System theme support (light/dark mode)
-- Native desktop application for macOS, Windows, and Linux
+- 🎥 Camera-based auto-mode: automatically controls your Key Light based on camera usage
+- 💡 Manual brightness control with presets
+- 🎨 Clean, modern dark interface
+- 💾 Persists settings between sessions
+- 🖥️ Native desktop app for macOS (Apple Silicon & Intel)
+
+## Installation
+
+Download the latest version from the [Releases](https://github.com/netoabel/keylight-control/releases) page.
+
+### Requirements
+
+- macOS 10.13 or later
+- Elgato Key Light connected to your network
 
 ## Development
 
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-- Git
-
-### Setup
-
-1. Clone the repository
-
 ```bash
+# Clone the repository
 git clone https://github.com/netoabel/keylight-control.git
 cd keylight-control
-```
 
-2. Install dependencies
-
-```bash
+# Install dependencies
 npm install
-```
 
-3. Run the development server
-
-```bash
+# Start development server
 npm run electron:dev
-```
 
-### Building
-
-To create a production build:
-
-```bash
+# Build for production
 npm run electron:build
 ```
 
-This will generate platform-specific installers in the `release` directory.
+### Tech Stack
+
+- Electron
+- React
+- TypeScript
+- Tailwind CSS
+- Radix UI
+
+## License
+
+MIT © [Abel Neto](https://github.com/netoabel)
