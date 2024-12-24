@@ -14,16 +14,13 @@ A sleek desktop application to control your Elgato Key Light. Features automatic
 
 1. Download the [latest version](https://github.com/netoabel/keylight-control/releases/latest)
 
-2. Open the app:
-   - Right-click on the app
-   - Select "Open" from the context menu
-   - Click "Open" in the security dialog
-
-Alternatively, you can run this command in Terminal:
+2. After installing, open Terminal and run:
 
 ```bash
 xattr -cr /Applications/keylight-control.app
 ```
+
+3. Open the app and enjoy!
 
 ### Requirements
 
