@@ -67,9 +67,7 @@
     "mac": {
       "icon": "assets/icon.icns",
       "category": "public.app-category.utilities",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "notarize": false,
+      "identity": null,
       "target": [
         {
           "target": "dmg",
