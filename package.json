@@ -68,8 +68,10 @@
       "icon": "assets/icon.icns",
       "category": "public.app-category.utilities",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
       ]
     },
     "win": {
