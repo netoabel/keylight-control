@@ -1,6 +1,6 @@
 # Keylight Control
 
-A sleek desktop application to control your Elgato Key Light. Features automatic camera-based control and a modern user interface.
+A sleek desktop application to control your Elgato Key Light. Features automatic camera-based control.
 
 ![App Screenshot](screenshots/app.png)
 
@@ -8,13 +8,11 @@ A sleek desktop application to control your Elgato Key Light. Features automatic
 
 - 🎥 Camera-based auto-mode: automatically controls your Key Light based on camera usage
 - 💡 Manual brightness control with presets
-- 🎨 Clean, modern dark interface
-- 💾 Persists settings between sessions
 - 🖥️ Native desktop app for macOS (Apple Silicon & Intel)
 
 ## Installation
 
-Download the latest version from the [Releases](https://github.com/netoabel/keylight-control/releases) page.
+Download the latest version from the [Releases](https://github.com/netoabel/keylight-control/releases/latest) page.
 
 ### Requirements
 
@@ -37,14 +35,6 @@ npm run electron:dev
 # Build for production
 npm run electron:build
 ```
-
-### Tech Stack
-
-- Electron
-- React
-- TypeScript
-- Tailwind CSS
-- Radix UI
 
 ## License
 
