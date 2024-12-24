@@ -15,7 +15,8 @@ const store = new Store({
   },
 });
 
-const keylight = new KeyLight();
+const keylight =
+  process.env.NODE_ENV === "development" ? new KeyLight() : new KeyLight("localhost", 9123);
 
 let mainWindow: BrowserWindow | null = null;
 let autoModeEnabled = store.get("autoModeEnabled");
