@@ -8,6 +8,10 @@ const Store = require("electron-store");
 const store = new Store({
   defaults: {
     autoModeEnabled: false,
+    windowBounds: {
+      x: undefined,
+      y: undefined,
+    },
   },
 });
 
@@ -17,9 +21,13 @@ let mainWindow: BrowserWindow | null = null;
 let autoModeEnabled = store.get("autoModeEnabled");
 
 function createWindow(): void {
+  const { x, y } = store.get("windowBounds");
+
   mainWindow = new BrowserWindow({
     width: 362,
     height: 310,
+    x,
+    y,
     titleBarStyle: "customButtonsOnHover",
     frame: false,
     resizable: false,
@@ -45,6 +53,14 @@ function createWindow(): void {
 
   mainWindow.on("closed", () => {
     mainWindow = null;
+  });
+
+  mainWindow.on("moved", () => {
+    const bounds = mainWindow?.getBounds();
+    store.set("windowBounds", {
+      x: bounds?.x,
+      y: bounds?.y,
+    });
   });
 
   syncKeylightState();
