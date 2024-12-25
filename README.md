@@ -6,10 +6,10 @@ A sleek desktop application to control your Elgato Key Light. Features automatic
 
 ## Features
 
+- 🖥️ Desktop app for macOS (Apple Silicon & Intel)
 - 🎥 Camera-based auto-mode: automatically controls your Key Light based on camera usage
 - 💡 Manual brightness control with customizable presets
 - 🌡️ Color temperature control with customizable presets
-- 🖥️ Desktop app for macOS (Apple Silicon & Intel)
 
 ## Installation
 
