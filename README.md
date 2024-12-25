@@ -7,7 +7,8 @@ A sleek desktop application to control your Elgato Key Light. Features automatic
 ## Features
 
 - 🎥 Camera-based auto-mode: automatically controls your Key Light based on camera usage
-- 💡 Manual brightness control with presets
+- 💡 Manual brightness control with customizable presets
+- 🌡️ Color temperature control with customizable presets
 - 🖥️ Native desktop app for macOS (Apple Silicon & Intel)
 
 ## Installation
@@ -31,11 +32,19 @@ xattr -cr /Applications/keylight-control.app
 
 ### Presets
 
-The app includes Low and High brightness presets that can be customized:
+The app includes customizable presets for both brightness and color temperature:
+
+#### Brightness Presets (Low/High)
 
 - Click a preset button to apply its brightness value
 - Long press a preset button to save the current brightness as the new preset value
 - Note: High preset must be brighter than Low preset
+
+#### Temperature Presets (Warm/Cold)
+
+- Click a preset button to apply its temperature value
+- Long press a preset button to save the current temperature as the new preset value
+- Note: Cold preset must be cooler (higher Kelvin) than Warm preset
 
 ## Development
 
