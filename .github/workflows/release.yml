@@ -18,11 +18,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: "npm"
 
       - name: Install Dependencies
-        run: |
-          npm ci
+        run: npm install --no-optional
 
       - name: Build Frontend
         run: npm run build
