@@ -30,6 +30,26 @@ xattr -cr /Applications/keylight-control.app
 
 ## Usage
 
+### Connection Settings
+
+By default, the app tries to connect to your Key Light at `elgato-key-light-air-ec6e.local:9123`. If this doesn't work:
+
+![Connection Error Screen](screenshots/connection-error.png)
+
+1. Click "Configure Connection" on the connection error screen
+2. Enter your Key Light's IP address (e.g., `192.168.1.100`)
+3. Enter the port (default is `9123`)
+4. Click Save to apply and retry the connection
+
+![Configure Connection Screen](screenshots/configure-connection.png)
+
+To find your Key Light's IP address:
+
+- Open the Elgato Control Center app
+- Select your Key Light
+- Click the settings icon (⚙️)
+- Look for the "IP Address" field
+
 ### Camera Auto-Mode
 
 When enabled, the app automatically controls your Key Light based on camera usage:

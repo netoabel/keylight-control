@@ -23,7 +23,14 @@ const store = new Store({
       port: 9123,
     },
   },
-});
+}) as {
+  defaults: {
+    autoModeEnabled: boolean;
+    windowBounds: { x: number | undefined; y: number | undefined };
+    presets: { low: number; high: number; warm: number; cold: number };
+    keylight: { host: string; port: number };
+  };
+};
 
 const { host, port } = store.get("keylight");
 let keylight = new KeyLight(host, port);
