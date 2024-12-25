@@ -20,7 +20,9 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
-        run: npm install --no-optional
+        run: |
+          npm install dmg-license
+          npm install --production=false
 
       - name: Build Frontend
         run: npm run build
