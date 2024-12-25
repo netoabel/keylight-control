@@ -30,6 +30,15 @@ xattr -cr /Applications/keylight-control.app
 
 ## Usage
 
+### Camera Auto-Mode
+
+When enabled, the app automatically controls your Key Light based on camera usage:
+
+- Light turns on when any app starts using your camera
+- Light turns off when all apps stop using your camera
+- Manual controls still work while auto-mode is enabled
+- Your last used brightness and temperature settings are preserved
+
 ### Presets
 
 The app includes customizable presets for both brightness and color temperature:
