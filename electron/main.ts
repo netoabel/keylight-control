@@ -15,6 +15,8 @@ const store = new Store({
     presets: {
       low: 10,
       high: 30,
+      warm: 4000,
+      cold: 7000,
     },
     keylight: {
       host: "elgato-key-light-air-ec6e.local",
@@ -35,7 +37,7 @@ function createWindow(): void {
 
   mainWindow = new BrowserWindow({
     width: 362,
-    height: 310,
+    height: 420,
     x,
     y,
     titleBarStyle: "customButtonsOnHover",
@@ -141,15 +143,31 @@ ipcMain.on("keylight-control", async (_event, args) => {
         await syncKeylightState();
         break;
       }
+      case "setTemperature":
+        console.log("setTemperature", args.value);
+        await keylight.setTemperature(args.value);
+        await syncKeylightState();
+        break;
+      case "updateTemperaturePreset": {
+        console.log("updateTemperaturePreset", args.preset, args.value);
+        const currentPresets = store.get("presets");
+        const newPresets = {
+          ...currentPresets,
+          [args.preset]: args.value,
+        };
+        store.set("presets", newPresets);
+        await syncKeylightState();
+        break;
+      }
       default:
         console.error("Unknown action:", args.action);
     }
   } catch (error) {
-    console.error("Failed to control Keylight:", error);
-    isConnected = false;
+    console.error("Failed to execute action:", error);
     mainWindow?.webContents.send("keylight-state", {
       connected: false,
       error: "Could not connect to keylight",
+      config: store.get("keylight"),
     });
   }
 });
@@ -162,6 +180,7 @@ async function syncKeylightState() {
       connected: true,
       on: state.on === 1,
       brightness: state.brightness,
+      temperature: state.temperature,
       autoMode: autoModeEnabled,
       presets: store.get("presets"),
       config: store.get("keylight"),
@@ -173,6 +192,7 @@ async function syncKeylightState() {
       connected: false,
       error: "Could not connect to keylight",
       config: store.get("keylight"),
+      presets: store.get("presets"),
     });
   }
 }

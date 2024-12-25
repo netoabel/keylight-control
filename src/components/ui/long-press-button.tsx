@@ -86,13 +86,10 @@ export function LongPressButton({
         {children}
       </Button>
       {pressing && (
-        <div className="absolute bottom-0 left-0 h-1 bg-white/20 w-full overflow-hidden">
+        <div className="absolute bottom-0 left-0 h-1 bg-white/20 w-full overflow-hidden rounded-b-md">
           <div
             className="h-full bg-white/40"
-            style={{ 
-              width: `${progress}%`,
-              transition: 'width 16.67ms linear'
-            }}
+            style={{ width: `${progress}%` }}
           />
         </div>
       )}

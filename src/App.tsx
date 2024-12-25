@@ -21,10 +21,16 @@ export function App() {
   const [autoMode, setAutoMode] = useState(false)
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [presets, setPresets] = useState({ low: 10, high: 30 })
+  const [presets, setPresets] = useState({ 
+    low: 10, 
+    high: 30,
+    warm: 4000,
+    cold: 7000
+  })
   const [showConfig, setShowConfig] = useState(false)
   const [keylightHost, setKeylightHost] = useState("")
   const [keylightPort, setKeylightPort] = useState("")
+  const [temperature, setTemperature] = useState(7000)
 
   useEffect(() => {
     if (window.electron) {
@@ -38,6 +44,7 @@ export function App() {
           setPresets(state.presets)
           setKeylightHost(state.config.host)
           setKeylightPort(state.config.port.toString())
+          setTemperature(state.temperature)
         } else {
           setConnected(false)
           setError(state.error)
@@ -176,6 +183,40 @@ export function App() {
     }
   };
 
+  const handleTemperatureChange = (value: number[]) => {
+    setTemperature(value[0]);
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", { 
+        action: "setTemperature", 
+        value: value[0] 
+      });
+    }
+  };
+
+  const handleTemperaturePreset = (preset: "warm" | "cold") => {
+    const presetValue = presets[preset];
+    console.log("Setting temperature to preset:", preset, presetValue);
+    if (window.electron && presetValue !== undefined) {
+      setTemperature(presetValue);
+      window.electron.sendMessage("keylight-control", { 
+        action: "setTemperature", 
+        value: presetValue 
+      });
+    }
+  };
+
+  const handleTemperaturePresetUpdate = (preset: "warm" | "cold") => {
+    const newValue = temperature;
+    console.log("Updating temperature preset:", preset, newValue);
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", {
+        action: "updateTemperaturePreset",
+        preset,
+        value: newValue,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1C1C1C]">
       <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-[#1C1C1C]/50 backdrop-blur-sm" />
@@ -213,12 +254,12 @@ export function App() {
                 className="cursor-pointer"
               />
             </div>
-            <div className="flex justify-between gap-4">
+            <div className="flex justify-between gap-2">
               <LongPressButton
                 onClick={() => handlePresetBrightness("low")}
                 onLongPress={() => handlePresetUpdate("low")}
                 variant="outline"
-                className="w-[156px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
               >
                 Low
               </LongPressButton>
@@ -226,9 +267,41 @@ export function App() {
                 onClick={() => handlePresetBrightness("high")}
                 onLongPress={() => handlePresetUpdate("high")}
                 variant="outline"
-                className="w-[156px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
               >
                 High
+              </LongPressButton>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Temperature</span>
+                <span className="text-sm text-muted-foreground">{temperature}K</span>
+              </div>
+              <Slider
+                value={[temperature]}
+                onValueChange={handleTemperatureChange}
+                min={2900}
+                max={7000}
+                step={100}
+                className="cursor-pointer"
+              />
+            </div>
+            <div className="flex justify-between gap-2">
+              <LongPressButton
+                onClick={() => handleTemperaturePreset("warm")}
+                onLongPress={() => handleTemperaturePresetUpdate("warm")}
+                variant="outline"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+              >
+                Warm
+              </LongPressButton>
+              <LongPressButton
+                onClick={() => handleTemperaturePreset("cold")}
+                onLongPress={() => handleTemperaturePresetUpdate("cold")}
+                variant="outline"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+              >
+                Cold
               </LongPressButton>
             </div>
           </CardContent>
