@@ -23,7 +23,6 @@ jobs:
       - name: Install Dependencies
         run: |
           npm ci
-          npm run postinstall
 
       - name: Build Frontend
         run: npm run build
