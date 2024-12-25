@@ -16,11 +16,15 @@ const store = new Store({
       low: 10,
       high: 30,
     },
+    keylight: {
+      host: "elgato-key-light-air-ec6e.local",
+      port: 9123,
+    },
   },
 });
 
-const keylight =
-  process.env.NODE_ENV === "development" ? new KeyLight("localhost", 9123) : new KeyLight();
+const { host, port } = store.get("keylight");
+let keylight = new KeyLight(host, port);
 
 let mainWindow: BrowserWindow | null = null;
 let autoModeEnabled = store.get("autoModeEnabled");
@@ -132,12 +136,16 @@ ipcMain.on("keylight-control", async (_event, args) => {
         await syncKeylightState();
         break;
       }
+      case "updateConfig": {
+        store.set("keylight", args.config);
+        await syncKeylightState();
+        break;
+      }
       default:
         console.error("Unknown action:", args.action);
     }
   } catch (error) {
     console.error("Failed to control Keylight:", error);
-    // Send disconnected state when any operation fails
     isConnected = false;
     mainWindow?.webContents.send("keylight-state", {
       connected: false,
@@ -156,6 +164,7 @@ async function syncKeylightState() {
       brightness: state.brightness,
       autoMode: autoModeEnabled,
       presets: store.get("presets"),
+      config: store.get("keylight"),
     });
   } catch (error) {
     console.error("Failed to get Keylight state:", error);
@@ -163,6 +172,7 @@ async function syncKeylightState() {
     mainWindow?.webContents.send("keylight-state", {
       connected: false,
       error: "Could not connect to keylight",
+      config: store.get("keylight"),
     });
   }
 }

@@ -22,6 +22,9 @@ export function App() {
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [presets, setPresets] = useState({ low: 10, high: 30 })
+  const [showConfig, setShowConfig] = useState(false)
+  const [keylightHost, setKeylightHost] = useState("")
+  const [keylightPort, setKeylightPort] = useState("")
 
   useEffect(() => {
     if (window.electron) {
@@ -33,9 +36,13 @@ export function App() {
           setBrightness(state.brightness)
           setAutoMode(state.autoMode)
           setPresets(state.presets)
+          setKeylightHost(state.config.host)
+          setKeylightPort(state.config.port.toString())
         } else {
           setConnected(false)
           setError(state.error)
+          setKeylightHost(state.config.host)
+          setKeylightPort(state.config.port.toString())
         }
       })
 
@@ -46,6 +53,17 @@ export function App() {
   const handleRetry = () => {
     window.electron.sendMessage("keylight-control", { action: "retry" })
   }
+
+  const handleConfigSave = () => {
+    window.electron.sendMessage("keylight-control", { 
+      action: "updateConfig", 
+      config: {
+        host: keylightHost,
+        port: parseInt(keylightPort, 10)
+      }
+    });
+    setShowConfig(false);
+  };
 
   if (!connected) {
     return (
@@ -66,6 +84,45 @@ export function App() {
               >
                 Try Again
               </Button>
+              
+              {!showConfig ? (
+                <button
+                  onClick={() => setShowConfig(true)}
+                  className="text-xs text-gray-500 bg-transparent border-none cursor-pointer"
+                >
+                  Configure Connection
+                </button>
+              ) : (
+                <div className="space-y-4 w-full">
+                  <div className="flex gap-4">
+                    <div className="space-y-2 flex-1">
+                      <label className="text-xs text-gray-500">Host</label>
+                      <input
+                        type="text"
+                        value={keylightHost}
+                        onChange={(e) => setKeylightHost(e.target.value)}
+                        className="w-full bg-[#383A3C] text-white border-none rounded-md px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div className="space-y-2 w-[4.5rem]">
+                      <label className="text-xs text-gray-500">Port</label>
+                      <input
+                        type="number"
+                        value={keylightPort}
+                        onChange={(e) => setKeylightPort(e.target.value)}
+                        className="w-full bg-[#383A3C] text-white border-none rounded-md px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleConfigSave}
+                    variant="outline"
+                    className="w-full bg-[#383A3C] text-white hover:bg-[#383A3C] border-none mt-4"
+                  >
+                    Save
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
