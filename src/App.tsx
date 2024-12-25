@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { LongPressButton } from "@/components/ui/long-press-button"
 import "./App.css"
 
 declare global {
@@ -20,6 +21,7 @@ export function App() {
   const [autoMode, setAutoMode] = useState(false)
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [presets, setPresets] = useState({ low: 10, high: 30 })
 
   useEffect(() => {
     if (window.electron) {
@@ -30,6 +32,7 @@ export function App() {
           setIsOn(state.on)
           setBrightness(state.brightness)
           setAutoMode(state.autoMode)
+          setPresets(state.presets)
         } else {
           setConnected(false)
           setError(state.error)
@@ -59,7 +62,7 @@ export function App() {
               <Button
                 onClick={handleRetry}
                 variant="outline"
-                className="w-32 bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-24 bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
               >
                 Try Again
               </Button>
@@ -95,12 +98,26 @@ export function App() {
   }
 
   const handlePresetBrightness = (preset: "high" | "low") => {
-    const presetValue = preset === "high" ? 30 : 10
+    const presetValue = presets[preset]
     setBrightness(presetValue)
     if (window.electron) {
       window.electron.sendMessage("keylight-control", { action: "setBrightness", value: presetValue })
     }
   }
+
+  const handlePresetUpdate = (preset: "high" | "low") => {
+    const newValue = brightness;
+    if (
+      (preset === "high" && newValue > presets.low) ||
+      (preset === "low" && newValue < presets.high)
+    ) {
+      window.electron.sendMessage("keylight-control", {
+        action: "updatePreset",
+        preset,
+        value: newValue,
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#1C1C1C]">
@@ -140,20 +157,22 @@ export function App() {
               />
             </div>
             <div className="flex justify-between gap-4">
-              <Button 
-                onClick={() => handlePresetBrightness("low")} 
-                variant="outline" 
-                className="flex-1 bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+              <LongPressButton
+                onClick={() => handlePresetBrightness("low")}
+                onLongPress={() => handlePresetUpdate("low")}
+                variant="outline"
+                className="w-[156px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
               >
                 Low
-              </Button>
-              <Button 
-                onClick={() => handlePresetBrightness("high")} 
-                variant="outline" 
-                className="flex-1 bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+              </LongPressButton>
+              <LongPressButton
+                onClick={() => handlePresetBrightness("high")}
+                onLongPress={() => handlePresetUpdate("high")}
+                variant="outline"
+                className="w-[156px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
               >
                 High
-              </Button>
+              </LongPressButton>
             </div>
           </CardContent>
         </Card>

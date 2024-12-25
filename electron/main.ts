@@ -12,6 +12,10 @@ const store = new Store({
       x: undefined,
       y: undefined,
     },
+    presets: {
+      low: 10,
+      high: 30,
+    },
   },
 });
 
@@ -118,6 +122,16 @@ ipcMain.on("keylight-control", async (_event, args) => {
         store.set("autoModeEnabled", args.enabled);
         await syncKeylightState();
         break;
+      case "updatePreset": {
+        const currentPresets = store.get("presets");
+        const newPresets = {
+          ...currentPresets,
+          [args.preset]: args.value,
+        };
+        store.set("presets", newPresets);
+        await syncKeylightState();
+        break;
+      }
       default:
         console.error("Unknown action:", args.action);
     }
@@ -141,6 +155,7 @@ async function syncKeylightState() {
       on: state.on === 1,
       brightness: state.brightness,
       autoMode: autoModeEnabled,
+      presets: store.get("presets"),
     });
   } catch (error) {
     console.error("Failed to get Keylight state:", error);

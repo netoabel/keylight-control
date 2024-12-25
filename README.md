@@ -27,6 +27,16 @@ xattr -cr /Applications/keylight-control.app
 - macOS 10.13 or later
 - Elgato Key Light connected to your network
 
+## Usage
+
+### Presets
+
+The app includes Low and High brightness presets that can be customized:
+
+- Click a preset button to apply its brightness value
+- Long press a preset button to save the current brightness as the new preset value
+- Note: High preset must be brighter than Low preset
+
 ## Development
 
 ```bash
