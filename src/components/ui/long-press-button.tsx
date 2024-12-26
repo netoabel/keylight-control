@@ -21,6 +21,7 @@ export function LongPressButton({
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>();
   const hasLongPressed = useRef(false);
+  const longPressStarted = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -34,6 +35,9 @@ export function LongPressButton({
     if (!startTimeRef.current) return;
 
     const elapsed = Date.now() - startTimeRef.current;
+    if (elapsed >= 100) {
+      longPressStarted.current = true;
+    }
     const newProgress = Math.min((elapsed / duration) * 100, 100);
     setProgress(newProgress);
 
@@ -49,6 +53,7 @@ export function LongPressButton({
   const startPressing = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     setPressing(true);
+    longPressStarted.current = false;
     hasLongPressed.current = false;
     startTimeRef.current = Date.now();
     animationFrameRef.current = requestAnimationFrame(updateProgress);
@@ -61,6 +66,7 @@ export function LongPressButton({
     setPressing(false);
     setProgress(0);
     startTimeRef.current = undefined;
+    longPressStarted.current = false;
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -85,7 +91,7 @@ export function LongPressButton({
       >
         {children}
       </Button>
-      {pressing && (
+      {pressing && longPressStarted.current && (
         <div className="absolute bottom-0 left-0 h-1 bg-white/20 w-full overflow-hidden rounded-b-md">
           <div
             className="h-full bg-white/40"
