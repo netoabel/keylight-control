@@ -40,6 +40,7 @@ function updateKeylightState(newState: string): void {
   run({
     action: async () => {
       await (newState === "On" ? keylightManager.turnOn() : keylightManager.turnOff());
+      await keylightManager.syncState();
     },
   });
 }
