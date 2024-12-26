@@ -191,7 +191,6 @@ export function App() {
 
   const handleTemperaturePreset = (preset: "warm" | "cold") => {
     const presetValue = presets[preset];
-    console.log("Setting temperature to preset:", preset, presetValue);
     if (window.electron && presetValue !== undefined) {
       setTemperature(presetValue);
       window.electron.sendMessage("keylight-control", { 
@@ -203,10 +202,9 @@ export function App() {
 
   const handleTemperaturePresetUpdate = (preset: "warm" | "cold") => {
     const newValue = temperature;
-    console.log("Updating temperature preset:", preset, newValue);
     if (window.electron) {
       window.electron.sendMessage("keylight-control", {
-        action: "updateTemperaturePreset",
+        action: "updatePreset",
         preset,
         value: newValue,
       });
