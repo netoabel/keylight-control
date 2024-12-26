@@ -2,6 +2,7 @@ import { KeyLight } from "elgato-keylight";
 import { BrowserWindow } from "electron";
 import Store from "electron-store";
 import { keylightConfig } from "./shared/keylight-config";
+import { temperatureUtils } from "./shared/temperature-utils";
 
 type StoreSchema = {
   autoModeEnabled: boolean;
@@ -41,12 +42,13 @@ export class KeylightManager {
   async syncState() {
     try {
       const state = await this.keylight.getCurrentState();
+      console.log("state", state);
       this.isConnected = true;
       this.mainWindow?.webContents.send("keylight-state", {
         connected: true,
         on: state.on === 1,
         brightness: state.brightness,
-        temperature: state.temperature,
+        temperature: temperatureUtils.toKelvin(state.temperature),
         autoMode: this.store.get("autoModeEnabled"),
         presets: this.store.get("presets"),
         config: this.store.get("keylight"),
@@ -82,8 +84,8 @@ export class KeylightManager {
     await this.keylight.setBrightness(brightness);
   }
 
-  async setTemperature(temperature: number) {
-    await this.keylight.setTemperature(temperature);
+  async setTemperature(value: number) {
+    await this.keylight.setTemperature(temperatureUtils.toDeviceValue(value));
   }
 
   async updatePreset(preset: string, value: number) {
