@@ -3,6 +3,7 @@ import * as path from "path";
 import { KeyLight } from "elgato-keylight";
 import * as camera from "camera-watch";
 import * as worker from "./worker";
+import { keylightConfig } from "./shared/keylight-config";
 const Store = require("electron-store");
 
 const store = new Store({
@@ -12,15 +13,10 @@ const store = new Store({
       x: undefined,
       y: undefined,
     },
-    presets: {
-      low: 10,
-      high: 30,
-      warm: 4000,
-      cold: 7000,
-    },
+    presets: keylightConfig.presets,
     keylight: {
-      host: "elgato-key-light-air-ec6e.local",
-      port: 9123,
+      host: keylightConfig.default.host,
+      port: keylightConfig.default.port,
     },
   },
 });

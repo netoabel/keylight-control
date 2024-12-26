@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LongPressButton } from "@/components/ui/long-press-button"
 import "./App.css"
+import { keylightConfig } from "../electron/shared/keylight-config"
 
 declare global {
   interface Window {
@@ -17,20 +18,15 @@ declare global {
 
 export function App() {
   const [isOn, setIsOn] = useState(false)
-  const [brightness, setBrightness] = useState(50)
+  const [brightness, setBrightness] = useState(keylightConfig.brightness.default)
   const [autoMode, setAutoMode] = useState(false)
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [presets, setPresets] = useState({ 
-    low: 10, 
-    high: 30,
-    warm: 4000,
-    cold: 7000
-  })
+  const [presets, setPresets] = useState(keylightConfig.presets)
   const [showConfig, setShowConfig] = useState(false)
   const [keylightHost, setKeylightHost] = useState("")
   const [keylightPort, setKeylightPort] = useState("")
-  const [temperature, setTemperature] = useState(7000)
+  const [temperature, setTemperature] = useState(keylightConfig.temperature.default)
 
   useEffect(() => {
     if (window.electron) {
@@ -97,7 +93,7 @@ export function App() {
                   onClick={() => setShowConfig(true)}
                   className="text-xs text-gray-500 bg-transparent border-none cursor-pointer"
                 >
-                  Configure Connection
+                  Configure connection
                 </button>
               ) : (
                 <div className="space-y-4 w-full">
@@ -249,8 +245,9 @@ export function App() {
               <Slider
                 value={[brightness]}
                 onValueChange={handleBrightnessChange}
-                max={100}
-                step={1}
+                min={keylightConfig.brightness.min}
+                max={keylightConfig.brightness.max}
+                step={keylightConfig.brightness.step}
                 className="cursor-pointer"
               />
             </div>
@@ -259,7 +256,7 @@ export function App() {
                 onClick={() => handlePresetBrightness("low")}
                 onLongPress={() => handlePresetUpdate("low")}
                 variant="outline"
-                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
               >
                 Low
               </LongPressButton>
@@ -267,7 +264,7 @@ export function App() {
                 onClick={() => handlePresetBrightness("high")}
                 onLongPress={() => handlePresetUpdate("high")}
                 variant="outline"
-                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
               >
                 High
               </LongPressButton>
@@ -280,9 +277,9 @@ export function App() {
               <Slider
                 value={[temperature]}
                 onValueChange={handleTemperatureChange}
-                min={2900}
-                max={7000}
-                step={100}
+                min={keylightConfig.temperature.min}
+                max={keylightConfig.temperature.max}
+                step={keylightConfig.temperature.step}
                 className="cursor-pointer"
               />
             </div>
@@ -291,7 +288,7 @@ export function App() {
                 onClick={() => handleTemperaturePreset("warm")}
                 onLongPress={() => handleTemperaturePresetUpdate("warm")}
                 variant="outline"
-                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
               >
                 Warm
               </LongPressButton>
@@ -299,7 +296,7 @@ export function App() {
                 onClick={() => handleTemperaturePreset("cold")}
                 onLongPress={() => handleTemperaturePresetUpdate("cold")}
                 variant="outline"
-                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] border-none"
+                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
               >
                 Cold
               </LongPressButton>
