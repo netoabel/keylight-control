@@ -42,7 +42,6 @@ export class KeylightManager {
   async syncState() {
     try {
       const state = await this.keylight.getCurrentState();
-      console.log("state", state);
       this.isConnected = true;
       this.mainWindow?.webContents.send("keylight-state", {
         connected: true,

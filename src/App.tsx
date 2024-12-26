@@ -151,11 +151,15 @@ export function App() {
   }
 
   const handleBrightnessChange = (value: number[]) => {
-    setBrightness(value[0])
+    setBrightness(value[0]);
+  };
+
+  const handleBrightnessCommit = (value: number[]) => {
+    setBrightness(value[0]);
     if (window.electron) {
-      window.electron.sendMessage("keylight-control", { action: "setBrightness", value: value[0] })
+      window.electron.sendMessage("keylight-control", { action: "setBrightness", value: value[0] });
     }
-  }
+  };
 
   const handlePresetBrightness = (preset: "high" | "low") => {
     const presetValue = presets[preset]
@@ -181,10 +185,14 @@ export function App() {
 
   const handleTemperatureChange = (value: number[]) => {
     setTemperature(value[0]);
+  };
+
+  const handleTemperatureCommit = (value: number[]) => {
+    setTemperature(value[0]);
     if (window.electron) {
       window.electron.sendMessage("keylight-control", { 
         action: "setTemperature", 
-        value: value[0] 
+        value: value[0]
       });
     }
   };
@@ -243,6 +251,7 @@ export function App() {
               <Slider
                 value={[brightness]}
                 onValueChange={handleBrightnessChange}
+                onValueCommit={handleBrightnessCommit}
                 min={keylightConfig.brightness.min}
                 max={keylightConfig.brightness.max}
                 step={keylightConfig.brightness.step}
@@ -275,6 +284,7 @@ export function App() {
               <Slider
                 value={[temperature]}
                 onValueChange={handleTemperatureChange}
+                onValueCommit={handleTemperatureCommit}
                 min={keylightConfig.temperature.min}
                 max={keylightConfig.temperature.max}
                 step={keylightConfig.temperature.step}
