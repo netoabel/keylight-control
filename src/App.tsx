@@ -238,7 +238,11 @@ export function App() {
             </div>
             <Button
               onClick={handleToggle}
-              className="w-full bg-[#E60133] hover:bg-buttonRed/90 text-white"
+              className={`w-full ${
+                isOn 
+                  ? "bg-[#E60133] hover:bg-[#E60133]" 
+                  : "bg-[#383A3C] hover:bg-[#383A3C]"
+              } text-white`}
               variant="default"
             >
               {isOn ? "Turn Off" : "Turn On"}
