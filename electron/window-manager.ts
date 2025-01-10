@@ -22,6 +22,7 @@ export class WindowManager {
       frame: false,
       resizable: false,
       fullscreenable: false,
+      focusable: false,
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
       },
