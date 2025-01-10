@@ -10,14 +10,14 @@ export class WindowManager {
   createWindow() {
     const mainWindowState = windowStateKeeper({
       defaultWidth: 360,
-      defaultHeight: 420,
+      defaultHeight: 480,
     });
 
     this.mainWindow = new BrowserWindow({
       x: mainWindowState.x,
       y: mainWindowState.y,
       width: 360,
-      height: 420,
+      height: 480,
       show: false,
       frame: false,
       resizable: false,

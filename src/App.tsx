@@ -27,6 +27,7 @@ export function App() {
   const [keylightHost, setKeylightHost] = useState("")
   const [keylightPort, setKeylightPort] = useState("")
   const [temperature, setTemperature] = useState(keylightConfig.temperature.default)
+  const [showAdditional, setShowAdditional] = useState(false)
 
   useEffect(() => {
     if (window.electron) {
@@ -70,10 +71,10 @@ export function App() {
 
   if (!connected) {
     return (
-      <div className="min-h-screen bg-black flex items-center">
-        <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-black/50 backdrop-blur-sm" />
-        <div className="w-full">
-          <Card className="w-[360px] mx-auto bg-black border-none">
+      <div className="h-screen flex flex-col">
+        <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-[#1C1C1C]/50 backdrop-blur-sm" />
+        <div className="flex-1">
+          <Card className="w-[360px] h-full mx-auto bg-[#242424] border-none">
             <CardHeader className="app-drag cursor-move">
               <CardTitle className="text-white text-center text-2xl font-normal">
                 Could not connect to keylight
@@ -220,10 +221,10 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1C1C1C]">
+    <div className="h-screen flex flex-col">
       <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-[#1C1C1C]/50 backdrop-blur-sm" />
-      <div className="pt-[0px]">
-        <Card className="w-[360px] mx-auto bg-[#242424]">
+      <div className="flex-1">
+        <Card className="w-[360px] h-full mx-auto bg-[#242424] border-none">
           <CardHeader className="app-drag cursor-move">
             <CardTitle className="text-white">Keylight Control</CardTitle>
             <CardDescription className="text-gray-400">Manage your keylight settings</CardDescription>
@@ -280,39 +281,50 @@ export function App() {
                 High
               </LongPressButton>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Temperature</span>
-                <span className="text-sm text-muted-foreground">{temperature}K</span>
-              </div>
-              <Slider
-                value={[temperature]}
-                onValueChange={handleTemperatureChange}
-                onValueCommit={handleTemperatureCommit}
-                min={keylightConfig.temperature.min}
-                max={keylightConfig.temperature.max}
-                step={keylightConfig.temperature.step}
-                className="cursor-pointer"
-              />
-            </div>
-            <div className="flex justify-between gap-2">
-              <LongPressButton
-                onClick={() => handleTemperaturePreset("warm")}
-                onLongPress={() => handleTemperaturePresetUpdate("warm")}
-                variant="outline"
-                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
-              >
-                Warm
-              </LongPressButton>
-              <LongPressButton
-                onClick={() => handleTemperaturePreset("cold")}
-                onLongPress={() => handleTemperaturePresetUpdate("cold")}
-                variant="outline"
-                className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
-              >
-                Cold
-              </LongPressButton>
-            </div>
+            {showAdditional && (
+              <>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Temperature</span>
+                    <span className="text-sm text-muted-foreground">{temperature}K</span>
+                  </div>
+                  <Slider
+                    value={[temperature]}
+                    onValueChange={handleTemperatureChange}
+                    onValueCommit={handleTemperatureCommit}
+                    min={keylightConfig.temperature.min}
+                    max={keylightConfig.temperature.max}
+                    step={keylightConfig.temperature.step}
+                    className="cursor-pointer"
+                  />
+                </div>
+                <div className="flex justify-between gap-2">
+                  <LongPressButton
+                    onClick={() => handleTemperaturePreset("warm")}
+                    onLongPress={() => handleTemperaturePresetUpdate("warm")}
+                    variant="outline"
+                    className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
+                  >
+                    Warm
+                  </LongPressButton>
+                  <LongPressButton
+                    onClick={() => handleTemperaturePreset("cold")}
+                    onLongPress={() => handleTemperaturePresetUpdate("cold")}
+                    variant="outline"
+                    className="w-[150px] bg-[#383A3C] text-white hover:bg-[#383A3C] hover:text-white border-none"
+                  >
+                    Cold
+                  </LongPressButton>
+                </div>
+              </>
+            )}
+            <Button
+              onClick={() => setShowAdditional(!showAdditional)}
+              variant="ghost"
+              className="w-full text-muted-foreground text-sm hover:text-white hover:bg-transparent active:bg-transparent"
+            >
+              {showAdditional ? "Hide Additional Settings" : "Show Additional Settings"}
+            </Button>
           </CardContent>
         </Card>
       </div>
