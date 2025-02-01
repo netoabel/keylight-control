@@ -23,6 +23,7 @@ ipcMain.on("keylight-control", async (_event, args) => {
     switch (args.action) {
       case "updateConfig":
         await keylightManager.updateConfig(args.config);
+        windowManager.hideConfigWindow();
         break;
       case "setAutoMode":
         await keylightManager.setAutoMode(args.enabled);
@@ -41,6 +42,16 @@ ipcMain.on("keylight-control", async (_event, args) => {
         break;
       case "updatePreset":
         await keylightManager.updatePreset(args.preset, args.value);
+        break;
+      case "showConfig":
+        const config = await keylightManager.getConfig();
+        windowManager.showConfigWindow({
+          host: config.host || "",
+          port: config.port?.toString() || "",
+        });
+        break;
+      case "hideConfig":
+        windowManager.hideConfigWindow();
         break;
     }
     await keylightManager.syncState();

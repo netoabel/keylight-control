@@ -103,4 +103,12 @@ export class KeylightManager {
   setAutoMode(enabled: boolean) {
     this.store.set("autoModeEnabled", enabled);
   }
+
+  async getConfig() {
+    const { host, port } = this.store.get("keylight") as { host: string; port: number };
+    return {
+      host,
+      port,
+    };
+  }
 }

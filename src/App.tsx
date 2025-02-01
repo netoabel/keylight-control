@@ -4,12 +4,13 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LongPressButton } from "@/components/ui/long-press-button"
+import { ConfigScreen } from "@/components/config-screen"
 import "./App.css"
 import { keylightConfig } from "../electron/shared/keylight-config"
 
 declare global {
   interface Window {
-    electron: {
+    electron?: {
       sendMessage: (channel: string, args: any) => void
       onMessage: (channel: string, callback: (args: any) => void) => void
     }
@@ -30,6 +31,17 @@ export function App() {
   const [showAdditional, setShowAdditional] = useState(false)
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowConfig(params.get('config') === 'true');
+    
+    // Initialize config values from URL params if present
+    const host = params.get('host');
+    const port = params.get('port');
+    if (host) setKeylightHost(host);
+    if (port) setKeylightPort(port);
+  }, []);
+
+  useEffect(() => {
     if (window.electron) {
       window.electron.onMessage("keylight-state", (state) => {
         if (state.connected) {
@@ -38,15 +50,20 @@ export function App() {
           setIsOn(state.on)
           setBrightness(state.brightness)
           setAutoMode(state.autoMode)
-          setPresets(state.presets)
-          setKeylightHost(state.config.host)
-          setKeylightPort(state.config.port.toString())
           setTemperature(state.temperature)
+          if (state.config) {
+            setKeylightHost(state.config.host || "")
+            setKeylightPort(state.config.port?.toString() || "")
+          }
         } else {
           setConnected(false)
-          setError(state.error)
-          setKeylightHost(state.config.host)
-          setKeylightPort(state.config.port.toString())
+          if (state.error) {
+            setError(state.error)
+          }
+          if (state.config) {
+            setKeylightHost(state.config.host || "")
+            setKeylightPort(state.config.port?.toString() || "")
+          }
         }
       })
 
@@ -55,19 +72,58 @@ export function App() {
   }, [])
 
   const handleRetry = () => {
-    window.electron.sendMessage("keylight-control", { action: "retry" })
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", { action: "retry" })
+    }
   }
 
   const handleConfigSave = () => {
-    window.electron.sendMessage("keylight-control", { 
-      action: "updateConfig", 
-      config: {
-        host: keylightHost,
-        port: parseInt(keylightPort, 10)
-      }
-    });
-    setShowConfig(false);
-  };
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", {
+        action: "updateConfig",
+        config: {
+          host: keylightHost,
+          port: keylightPort ? parseInt(keylightPort, 10) : undefined,
+        },
+      })
+    }
+  }
+
+  const handleShowConfig = () => {
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", { action: "showConfig" })
+    }
+  }
+
+  const handleHideConfig = () => {
+    if (window.electron) {
+      window.electron.sendMessage("keylight-control", { action: "hideConfig" })
+    }
+  }
+
+  if (showConfig) {
+    return (
+      <div className="h-screen flex flex-col">
+        <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-[#1C1C1C]/50 backdrop-blur-sm" />
+        <div className="flex-1">
+          <ConfigScreen
+            host={keylightHost}
+            port={keylightPort}
+            onHostChange={(value: string) => {
+              console.log('Host change:', value)
+              setKeylightHost(value)
+            }}
+            onPortChange={(value: string) => {
+              console.log('Port change:', value)
+              setKeylightPort(value)
+            }}
+            onSave={handleConfigSave}
+            onBack={handleHideConfig}
+          />
+        </div>
+      </div>
+    )
+  }
 
   if (!connected) {
     return (
@@ -75,10 +131,11 @@ export function App() {
         <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-[#1C1C1C]/50 backdrop-blur-sm" />
         <div className="flex-1">
           <Card className="w-[360px] h-full mx-auto bg-[#242424] border-none">
-            <CardHeader className="app-drag cursor-move">
-              <CardTitle className="text-white text-center text-2xl font-normal">
-                Could not connect to keylight
-              </CardTitle>
+            <CardHeader className="app-drag cursor-move flex flex-row items-start justify-between p-4 pt-6 pb-3 relative">
+              <div className="ml-2">
+                <CardTitle className="text-white mb-1.5">Keylight Control</CardTitle>
+                <CardDescription className="text-gray-400">Could not connect to keylight</CardDescription>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4 app-no-drag flex flex-col items-center">
               <Button
@@ -88,45 +145,12 @@ export function App() {
               >
                 Try Again
               </Button>
-              
-              {!showConfig ? (
-                <button
-                  onClick={() => setShowConfig(true)}
-                  className="text-xs text-gray-500 bg-transparent border-none cursor-pointer"
-                >
-                  Configure connection
-                </button>
-              ) : (
-                <div className="space-y-4 w-full">
-                  <div className="flex gap-4">
-                    <div className="space-y-2 flex-1">
-                      <label className="text-xs text-gray-500">Host</label>
-                      <input
-                        type="text"
-                        value={keylightHost}
-                        onChange={(e) => setKeylightHost(e.target.value)}
-                        className="w-full bg-[#383A3C] text-white border-none rounded-md px-3 py-2 text-sm"
-                      />
-                    </div>
-                    <div className="space-y-2 w-[4.5rem]">
-                      <label className="text-xs text-gray-500">Port</label>
-                      <input
-                        type="number"
-                        value={keylightPort}
-                        onChange={(e) => setKeylightPort(e.target.value)}
-                        className="w-full bg-[#383A3C] text-white border-none rounded-md px-3 py-2 text-sm"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={handleConfigSave}
-                    variant="outline"
-                    className="w-full bg-[#383A3C] text-white hover:bg-[#383A3C] border-none mt-4"
-                  >
-                    Save
-                  </Button>
-                </div>
-              )}
+              <button
+                onClick={handleShowConfig}
+                className="text-xs text-gray-500 bg-transparent border-none cursor-pointer"
+              >
+                Configure connection
+              </button>
             </CardContent>
           </Card>
         </div>
@@ -144,9 +168,9 @@ export function App() {
   const handleAutoModeToggle = (checked: boolean) => {
     setAutoMode(checked)
     if (window.electron) {
-      window.electron.sendMessage("keylight-control", { 
-        action: "setAutoMode", 
-        enabled: checked 
+      window.electron.sendMessage("keylight-control", {
+        action: "setAutoMode",
+        enabled: checked,
       })
     }
   }
@@ -156,9 +180,9 @@ export function App() {
   };
 
   const handleBrightnessCommit = (value: number[]) => {
-    setBrightness(value[0]);
+    setBrightness(value[0])
     if (window.electron) {
-      window.electron.sendMessage("keylight-control", { action: "setBrightness", value: value[0] });
+      window.electron.sendMessage("keylight-control", { action: "setBrightness", value: value[0] })
     }
   };
 
@@ -176,11 +200,13 @@ export function App() {
       (preset === "high" && newValue > presets.low) ||
       (preset === "low" && newValue < presets.high)
     ) {
-      window.electron.sendMessage("keylight-control", {
-        action: "updatePreset",
-        preset,
-        value: newValue,
-      });
+      if (window.electron) {
+        window.electron.sendMessage("keylight-control", {
+          action: "updatePreset",
+          preset,
+          value: newValue,
+        });
+      }
     }
   };
 
@@ -225,11 +251,23 @@ export function App() {
       <div className="titlebar h-[0px] fixed top-0 left-0 right-0 app-drag bg-[#1C1C1C]/50 backdrop-blur-sm" />
       <div className="flex-1">
         <Card className="w-[360px] h-full mx-auto bg-[#242424] border-none">
-          <CardHeader className="app-drag cursor-move">
-            <CardTitle className="text-white">Keylight Control</CardTitle>
-            <CardDescription className="text-gray-400">Manage your keylight settings</CardDescription>
+          <CardHeader className="app-drag cursor-move flex flex-row items-start justify-between p-4 pt-6 pb-3 relative">
+            <div className="ml-2">
+              <CardTitle className="text-white mb-1.5">Keylight Control</CardTitle>
+              <CardDescription className="text-gray-400">Manage your keylight settings</CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="app-no-drag h-8 w-8 hover:bg-[#383A3C] absolute top-4 right-4"
+              onClick={handleShowConfig}
+            >
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-400">
+                <path d="M5.5 3C4.67157 3 4 3.67157 4 4.5C4 5.32843 4.67157 6 5.5 6C6.32843 6 7 5.32843 7 4.5C7 3.67157 6.32843 3 5.5 3ZM3 5C3.01671 5 3.03323 4.99918 3.04952 4.99758C3.28022 6.1399 4.28967 7 5.5 7C6.71033 7 7.71978 6.1399 7.95048 4.99758C7.96677 4.99918 7.98329 5 8 5H13.5C13.7761 5 14 4.77614 14 4.5C14 4.22386 13.7761 4 13.5 4H8C7.98329 4 7.96677 4.00082 7.95048 4.00242C7.71978 2.86009 6.71033 2 5.5 2C4.28967 2 3.28022 2.86009 3.04952 4.00242C3.03323 4.00082 3.01671 4 3 4H1.5C1.22386 4 1 4.22386 1 4.5C1 4.77614 1.22386 5 1.5 5H3ZM11.9505 10.9976C11.7198 12.1399 10.7103 13 9.5 13C8.28967 13 7.28022 12.1399 7.04952 10.9976C7.03323 10.9992 7.01671 11 7 11H1.5C1.22386 11 1 10.7761 1 10.5C1 10.2239 1.22386 10 1.5 10H7C7.01671 10 7.03323 10.0008 7.04952 10.0024C7.28022 8.8601 8.28967 8 9.5 8C10.7103 8 11.7198 8.8601 11.9505 10.0024C11.9668 10.0008 11.9833 10 12 10H13.5C13.7761 10 14 10.2239 14 10.5C14 10.7761 13.7761 11 13.5 11H12C11.9833 11 11.9668 10.9992 11.9505 10.9976ZM8 10.5C8 9.67157 8.67157 9 9.5 9C10.3284 9 11 9.67157 11 10.5C11 11.3284 10.3284 12 9.5 12C8.67157 12 8 11.3284 8 10.5Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+              </svg>
+            </Button>
           </CardHeader>
-          <CardContent className="space-y-4 app-no-drag">
+          <CardContent className="space-y-4 app-no-drag mt-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Camera Auto-Mode</span>
               <Switch
@@ -318,17 +356,18 @@ export function App() {
                 </div>
               </>
             )}
-            <Button
-              onClick={() => setShowAdditional(!showAdditional)}
-              variant="ghost"
-              className="w-full text-muted-foreground text-sm hover:text-white hover:bg-transparent active:bg-transparent"
-            >
-              {showAdditional ? "Hide Additional Settings" : "Show Additional Settings"}
-            </Button>
+            <div className="space-y-4">
+              <Button
+                onClick={() => setShowAdditional(!showAdditional)}
+                variant="ghost"
+                className="w-full text-muted-foreground text-sm hover:text-white hover:bg-transparent active:bg-transparent"
+              >
+                {showAdditional ? "Hide Additional Settings" : "Show Additional Settings"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
     </div>
   )
 }
-
