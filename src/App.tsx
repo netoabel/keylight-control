@@ -206,6 +206,10 @@ export function App() {
           preset,
           value: newValue,
         });
+        setPresets((prev) => ({
+          ...prev,
+          [preset]: newValue,
+        }));
       }
     }
   };

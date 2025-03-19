@@ -89,7 +89,10 @@ export class KeylightManager {
 
   async updatePreset(preset: string, value: number) {
     const currentPresets = this.store.get("presets") as typeof keylightConfig.presets;
-    this.store.set("presets", { ...currentPresets, [preset]: value });
+    const updatedPresets = { ...currentPresets, [preset]: value };
+    this.store.set("presets", updatedPresets);
+    // Sync state to ensure the UI gets the updated presets
+    await this.syncState();
   }
 
   get connected() {
